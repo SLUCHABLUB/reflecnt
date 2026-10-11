@@ -7,7 +7,7 @@ use std::iter::Peekable;
 #[derive(Copy, Clone, PartialEq, Debug, Display, Logos)]
 #[logos(skip r"\s+")]
 #[logos(error(SyntaxError<'static>, callback = SyntaxError::invalid_token))]
-pub(crate) enum Token<'source> {
+pub enum Token<'source> {
     #[display("`{_0}`")]
     #[regex(r"[\p{XID_Start}_]\p{XID_Continue}*")]
     Identifier(&'source str),
@@ -51,7 +51,7 @@ impl<'source> Token<'source> {
 }
 
 // TODO: Remove this type and make the parser function generic over any iterable.
-pub(crate) type TokenSet = Vec<Token<'static>>;
+pub type TokenSet = Vec<Token<'static>>;
 
 pub(crate) enum NonWhitespaceToken<'source> {
     Identifier(&'source str),

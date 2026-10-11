@@ -7,7 +7,7 @@ use std::num::NonZeroUsize;
 use thiserror::Error;
 
 #[derive(Clone, PartialEq, Debug, Default, Error)]
-pub(crate) enum SyntaxError<'source> {
+pub enum SyntaxError<'source> {
     #[error("invalid token `{token}` at {line}:{column}")]
     InvalidToken {
         line: NonZeroUsize,
@@ -45,10 +45,6 @@ impl SyntaxError<'_> {
             column,
             token: lexer.slice().to_owned(),
         }
-    }
-
-    pub(crate) fn anyhow(self) -> anyhow::Error {
-        anyhow::Error::msg(self.to_string())
     }
 }
 

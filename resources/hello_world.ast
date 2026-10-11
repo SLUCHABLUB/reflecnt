@@ -1,0 +1,21 @@
+Module {
+    statements: [
+        Expression(
+            Call {
+                callee: Identifier(
+                    "print",
+                ),
+                arguments: Table {
+                    entries: [
+                        TableEntry {
+                            key: None,
+                            value: TextLiteral {
+                                escaped: "\"Hello, World!\"",
+                            },
+                        },
+                    ],
+                },
+            },
+        ),
+    ],
+}

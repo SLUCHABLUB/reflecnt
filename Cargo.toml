@@ -12,3 +12,6 @@ literator = "0.4.0"
 logos = "0.16.1"
 non-zero = "0.2.0"
 thiserror = "2.0.21"
+
+[dev-dependencies]
+pretty_assertions = "1.4.1"

@@ -9,12 +9,12 @@ use itertools::Itertools as _;
 use std::iter;
 
 #[derive(Debug)]
-pub(crate) struct Module<'source> {
+pub struct Module<'source> {
     pub statements: Vec<Statement<'source>>,
 }
 
 impl Module<'_> {
-    pub(crate) fn parse<'source>(
+    pub fn parse<'source>(
         mut tokens: Tokens<'source>,
     ) -> Result<Module<'source>, SyntaxError<'source>> {
         Ok(Module {
@@ -25,7 +25,7 @@ impl Module<'_> {
 }
 
 #[derive(Debug)]
-pub(crate) enum Statement<'source> {
+pub enum Statement<'source> {
     Expression(Expression<'source>),
 }
 
@@ -44,7 +44,7 @@ impl Statement<'_> {
 }
 
 #[derive(Debug)]
-pub(crate) enum Expression<'source> {
+pub enum Expression<'source> {
     Identifier(&'source str),
     TextLiteral {
         escaped: &'source str,
@@ -158,7 +158,7 @@ impl Expression<'_> {
 }
 
 #[derive(Debug)]
-pub(crate) struct Table<'source> {
+pub struct Table<'source> {
     pub entries: Vec<TableEntry<'source>>,
 }
 
@@ -175,7 +175,7 @@ impl Table<'_> {
 }
 
 #[derive(Debug)]
-pub(crate) struct TableEntry<'source> {
+pub struct TableEntry<'source> {
     pub key: Option<Expression<'source>>,
     pub value: Expression<'source>,
 }

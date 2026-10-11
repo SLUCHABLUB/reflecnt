@@ -1,15 +1,12 @@
 mod arguments;
-mod ast;
-mod error;
-mod lexer;
 
 use crate::arguments::Arguments;
-use crate::ast::Module;
-use crate::error::SyntaxError;
-use crate::lexer::Token;
 use clap::Parser as _;
 use itertools::Itertools as _;
 use logos::Logos as _;
+use reflecnt::ast::Module;
+use reflecnt::error::SyntaxError;
+use reflecnt::lexer::Token;
 use std::fs::read_to_string;
 
 fn main() -> anyhow::Result<()> {
@@ -27,9 +24,13 @@ fn main() -> anyhow::Result<()> {
 
     let lexer = Token::lexer(&source);
 
-    let module = Module::parse(lexer.peekable()).map_err(SyntaxError::anyhow)?;
+    let module = Module::parse(lexer.peekable()).map_err(syntax_to_anyhow)?;
 
     println!("--- AST ---\n{module:#?}");
 
     Ok(())
+}
+
+fn syntax_to_anyhow(syntax: SyntaxError<'_>) -> anyhow::Error {
+    anyhow::Error::msg(syntax.to_string())
 }
