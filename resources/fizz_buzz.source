@@ -1,0 +1,14 @@
+for number in range(100) {
+    let divisible_by_3 = number % 3
+    let divisible_by_5 = number % 5
+
+    if divisible_by_3 & divisible_by_5 {
+        print("FizzBuzz")
+    } else if divisible_by_3 {
+        print("Fizz")
+    } else if divisible_by_5 {
+        print("Buzz")
+    } else {
+        print(number)
+    }
+}
