@@ -85,6 +85,18 @@ All objects can be stringified
 - Table: Assignment
 - Procedure: Modification? o_o
 
+## Keywords
+
+- `break`: Breaks from a loop
+- `continue`: Skips to the next iteration of a loop
+- `else`: Adds a non-true branch to an if-statement
+- `for`: Iterates over a collection
+- `if`: Branches if a value is true
+- `let`: Introduces a new binding in the current scope
+- `procedure`: Creates a procedure expression
+- `return`: Returns a value from a procedure
+- `while`: Loops while a condition is true
+
 ## Procedures
 
 Procedures are run in the scope in which they are defined.
@@ -176,7 +188,7 @@ let at_the_end = procedure {
     return program(instruction_pointer) == null;
 }
 
-procedure seek_closing_bracket {
+let seek_closing_bracket = procedure {
     let depth = 0
     let target_depth = 0
 
@@ -198,7 +210,7 @@ procedure seek_closing_bracket {
     }
 }
 
-procedure seek_opening_bracket {
+let seek_opening_bracket = procedure {
     let depth = 0
     let target_depth = 0
 

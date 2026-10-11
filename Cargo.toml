@@ -4,3 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+clap = { version = "4.6.7", features = ["derive"] }
+derive_more = { version = "2.1.1", features = ["display"] }
+itertools = "0.15.0"
+literator = "0.4.0"
+logos = "0.16.1"
+non-zero = "0.2.0"
+thiserror = "2.0.21"
