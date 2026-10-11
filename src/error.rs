@@ -46,6 +46,10 @@ impl SyntaxError<'_> {
             token: lexer.slice().to_owned(),
         }
     }
+
+    pub(crate) fn anyhow(self) -> anyhow::Error {
+        anyhow::Error::msg(self.to_string())
+    }
 }
 
 fn line_column_pair<'source>(lexer: &Lexer<'source, Token<'source>>) -> [NonZeroUsize; 2] {
