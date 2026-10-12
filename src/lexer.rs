@@ -16,6 +16,10 @@ pub enum Token<'source> {
     #[regex(r#"("(.|\")+")"#)]
     // TODO: Name the field.
     TextLiteral(&'source str),
+    #[display("`{_0}`")]
+    #[regex(r"[0-9]([0-9_]*[0-9])?i?")]
+    // TODO: Name the field.
+    NumberLiteral(&'source str),
 
     #[display("a line break")]
     #[regex(r"\n", priority = 42)]
@@ -42,6 +46,7 @@ impl<'source> Token<'source> {
         Some(match self {
             Token::Identifier(identifier) => NonWhitespaceToken::Identifier(identifier),
             Token::TextLiteral(escaped) => NonWhitespaceToken::TextLiteral(escaped),
+            Token::NumberLiteral(string) => NonWhitespaceToken::NumberLiteral(string),
             Token::LineBreak => return None,
             Token::Comma => NonWhitespaceToken::Comma,
             Token::OpeningParenthesis => NonWhitespaceToken::OpeningParenthesis,
@@ -56,6 +61,7 @@ pub type TokenSet = Vec<Token<'static>>;
 pub(crate) enum NonWhitespaceToken<'source> {
     Identifier(&'source str),
     TextLiteral(&'source str),
+    NumberLiteral(&'source str),
 
     Comma,
 

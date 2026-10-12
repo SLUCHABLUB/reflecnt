@@ -46,8 +46,13 @@ impl Statement<'_> {
 #[derive(Debug)]
 pub enum Expression<'source> {
     Identifier(&'source str),
-    TextLiteral {
+    Text {
+        // TODO: Store the value.
         escaped: &'source str,
+    },
+    Number {
+        // TODO: Store the value.
+        string: &'source str,
     },
     Call {
         callee: Box<Expression<'source>>,
@@ -113,7 +118,8 @@ impl Expression<'_> {
 
         let callee = match token {
             NonWhitespaceToken::Identifier(identifier) => Expression::Identifier(identifier),
-            NonWhitespaceToken::TextLiteral(escaped) => Expression::TextLiteral { escaped },
+            NonWhitespaceToken::TextLiteral(escaped) => Expression::Text { escaped },
+            NonWhitespaceToken::NumberLiteral(string) => Expression::Number { string },
             NonWhitespaceToken::Comma => {
                 return Err(SyntaxError::ExpectedExpression {
                     found: Token::Comma,

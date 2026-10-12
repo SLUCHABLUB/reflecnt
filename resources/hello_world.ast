@@ -9,7 +9,7 @@ Module {
                     entries: [
                         TableEntry {
                             key: None,
-                            value: TextLiteral {
+                            value: Text {
                                 escaped: "\"Hello, World!\"",
                             },
                         },
