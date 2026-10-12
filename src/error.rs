@@ -17,9 +17,6 @@ pub enum SyntaxError<'source> {
     },
     #[error("could not find a matching open bracket for the closing bracket")]
     UnmatchedClosingBracket,
-    // TODO: Remove.
-    #[error("expected {}", one_of(expected_one_of))]
-    UnexpectedEndOfFile { expected_one_of: TokenSet },
     #[error("expected an expression, found {found}")]
     ExpectedExpression { found: Token<'source> },
     #[error(
@@ -61,6 +58,15 @@ impl SyntaxError<'_> {
         SyntaxError::Expected {
             expected_one_of: vec![expected],
             found,
+        }
+    }
+
+    pub(crate) fn unexpected_end_of_file<'source>(
+        expected_one_of: TokenSet,
+    ) -> SyntaxError<'source> {
+        SyntaxError::Expected {
+            expected_one_of,
+            found: None,
         }
     }
 }

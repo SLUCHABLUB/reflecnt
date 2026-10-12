@@ -171,9 +171,7 @@ impl Expression<'_> {
         terminators: TokenSet,
     ) -> Result<Expression<'source>, SyntaxError<'source>> {
         let Some(token) = tokens.next().transpose()? else {
-            return Err(SyntaxError::UnexpectedEndOfFile {
-                expected_one_of: terminators,
-            });
+            return Err(SyntaxError::unexpected_end_of_file(terminators));
         };
 
         if terminators.contains(&token) {
