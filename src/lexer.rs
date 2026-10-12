@@ -6,7 +6,7 @@ use std::iter::Peekable;
 use subenum::subenum;
 
 #[derive(Copy, Clone, PartialEq, Debug, Display, Logos)]
-#[logos(skip r"\s+")]
+#[logos(skip r"[\t\p{Zs}]")]
 #[logos(error(SyntaxError<'static>, callback = SyntaxError::invalid_token))]
 #[subenum(NonWhitespaceToken)]
 pub enum Token<'source> {
@@ -27,7 +27,7 @@ pub enum Token<'source> {
     NumberLiteral(&'source str),
 
     #[display("a line break")]
-    #[regex(r"\n", priority = 42)]
+    #[regex(r"[\s--[\t\p{Zs}]]", priority = 42)]
     LineBreak,
 
     #[display("`=`")]

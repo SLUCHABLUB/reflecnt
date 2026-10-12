@@ -6,52 +6,64 @@
 `100`
 `)`
 `{`
+a line break
 `let`
 `divisible_by_3`
 `=`
 `number`
 `%`
 `3`
+a line break
 `let`
 `divisible_by_5`
 `=`
 `number`
 `%`
 `5`
+a line break
+a line break
 `if`
 `divisible_by_3`
 `&`
 `divisible_by_5`
 `{`
+a line break
 `print`
 `(`
 `"FizzBuzz"`
 `)`
+a line break
 `}`
 `else`
 `if`
 `divisible_by_3`
 `{`
+a line break
 `print`
 `(`
 `"Fizz"`
 `)`
+a line break
 `}`
 `else`
 `if`
 `divisible_by_5`
 `{`
+a line break
 `print`
 `(`
 `"Buzz"`
 `)`
+a line break
 `}`
 `else`
 `{`
+a line break
 `print`
 `(`
 `number`
 `)`
+a line break
 `}`
 a line break
 `}`
