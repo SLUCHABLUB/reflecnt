@@ -8,8 +8,13 @@ use subenum::subenum;
 #[derive(Copy, Clone, PartialEq, Debug, Display, Logos)]
 #[logos(skip r"[\t\p{Zs}]")]
 #[logos(error(SyntaxError<'static>, callback = SyntaxError::invalid_token))]
-#[subenum(NonWhitespaceToken)]
+#[subenum(Keyword, NonWhitespaceToken)]
 pub enum Token<'source> {
+    #[display("`for`")]
+    #[token("for")]
+    #[subenum(Keyword, NonWhitespaceToken)]
+    For,
+
     #[display("`{_0}`")]
     #[regex(r"[\p{XID_Start}_]\p{XID_Continue}*")]
     #[subenum(NonWhitespaceToken)]
@@ -46,6 +51,10 @@ pub enum Token<'source> {
     #[token("%")]
     #[subenum(NonWhitespaceToken)]
     Modulo,
+    #[display("`in`")]
+    #[token("in")]
+    #[subenum(NonWhitespaceToken)]
+    In,
 
     #[display("`(`")]
     #[token("(")]
@@ -67,6 +76,10 @@ pub enum Token<'source> {
 }
 
 impl<'source> Token<'source> {
+    pub(crate) fn as_keyword(&self) -> Option<Keyword> {
+        Keyword::try_from(*self).ok()
+    }
+
     pub(crate) fn is_whitespace(&self) -> bool {
         self.as_non_whitespace().is_none()
     }

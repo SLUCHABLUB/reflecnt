@@ -1,6 +1,7 @@
 #![expect(dead_code, reason = "we currently only look at the debug-print output")]
 
 use crate::error::SyntaxError;
+use crate::lexer::Keyword;
 use crate::lexer::NonWhitespaceToken;
 use crate::lexer::Token;
 use crate::lexer::TokenSet;
@@ -18,8 +19,14 @@ impl Module<'_> {
         mut tokens: Tokens<'source>,
     ) -> Result<Module<'source>, SyntaxError<'source>> {
         Ok(Module {
-            statements: iter::from_fn(|| Statement::parse(&mut tokens).transpose())
-                .try_collect()?,
+            statements: iter::from_fn(|| {
+                if tokens.peek().is_some() {
+                    Some(Statement::parse(&mut tokens))
+                } else {
+                    None
+                }
+            })
+            .try_collect()?,
         })
     }
 }
@@ -27,19 +34,73 @@ impl Module<'_> {
 #[derive(Debug)]
 pub enum Statement<'source> {
     Expression(Expression<'source>),
+    ForLoop {
+        variable: &'source str,
+        iterable: Expression<'source>,
+        body: Vec<Statement<'source>>,
+    },
 }
 
 impl Statement<'_> {
     fn parse<'source>(
         tokens: &mut Tokens<'source>,
-    ) -> Result<Option<Statement<'source>>, SyntaxError<'source>> {
-        if tokens.peek().is_none() {
-            return Ok(None);
+    ) -> Result<Statement<'source>, SyntaxError<'source>> {
+        Ok(
+            match tokens.next_if_map(|token| match token {
+                Ok(token) => token.as_keyword().ok_or(Ok(token)),
+                error => Err(error),
+            }) {
+                Some(keyword) => Statement::parse_from_keyword(keyword, tokens)?,
+                None => Statement::Expression(Expression::parse_line(tokens)?),
+            },
+        )
+    }
+
+    fn parse_from_keyword<'source>(
+        keyword: Keyword,
+        tokens: &mut Tokens<'source>,
+    ) -> Result<Statement<'source>, SyntaxError<'source>> {
+        Ok(match keyword {
+            Keyword::For => {
+                let variable = match tokens.next().transpose()? {
+                    Some(Token::Identifier(variable)) => variable,
+                    found => return Err(SyntaxError::ExpectedIterationVariable { found }),
+                };
+
+                match tokens.next().transpose()? {
+                    Some(Token::In) => (),
+                    found => return Err(SyntaxError::expected_found(Token::In, found)),
+                }
+
+                let iterable = Expression::parse_until(tokens, Token::ClosingBrace)?;
+
+                let body = Statement::parse_block(tokens)?;
+
+                Statement::ForLoop {
+                    variable,
+                    iterable,
+                    body,
+                }
+            }
+        })
+    }
+
+    fn parse_block<'source>(
+        tokens: &mut Tokens<'source>,
+    ) -> Result<Vec<Statement<'source>>, SyntaxError<'source>> {
+        match tokens.next().transpose()? {
+            Some(Token::OpeningBrace) => (),
+            found => return Err(SyntaxError::expected_found(Token::OpeningBrace, found)),
         }
 
-        Expression::parse_line(tokens)
-            .map(Statement::Expression)
-            .map(Some)
+        iter::from_fn(|| {
+            if tokens.peek() != Some(&Ok(Token::ClosingBrace)) {
+                Some(Statement::parse(tokens))
+            } else {
+                None
+            }
+        })
+        .collect()
     }
 }
 
@@ -84,7 +145,7 @@ impl Expression<'_> {
         tokens: &mut Tokens<'source>,
         terminators: TokenSet,
     ) -> Result<Expression<'source>, SyntaxError<'source>> {
-        let expression = Expression::parse_until(tokens, terminators.clone())?;
+        let expression = Expression::parse_until_one_of(tokens, terminators.clone())?;
 
         let terminator = tokens.next().transpose()?;
 
@@ -99,6 +160,13 @@ impl Expression<'_> {
     }
 
     fn parse_until<'source>(
+        tokens: &mut Tokens<'source>,
+        terminator: Token<'static>,
+    ) -> Result<Expression<'source>, SyntaxError<'source>> {
+        Expression::parse_until_one_of(tokens, vec![terminator])
+    }
+
+    fn parse_until_one_of<'source>(
         tokens: &mut Tokens<'source>,
         terminators: TokenSet,
     ) -> Result<Expression<'source>, SyntaxError<'source>> {
@@ -120,10 +188,13 @@ impl Expression<'_> {
             NonWhitespaceToken::Identifier(identifier) => Expression::Identifier(identifier),
             NonWhitespaceToken::TextLiteral(escaped) => Expression::Text { escaped },
             NonWhitespaceToken::NumberLiteral(string) => Expression::Number { string },
-            NonWhitespaceToken::Assignment
+
+            NonWhitespaceToken::For
+            | NonWhitespaceToken::Assignment
             | NonWhitespaceToken::Comma
             | NonWhitespaceToken::Conjunction
             | NonWhitespaceToken::Modulo
+            | NonWhitespaceToken::In
             | NonWhitespaceToken::OpeningBrace => {
                 return Err(SyntaxError::ExpectedExpression {
                     found: Token::from(token),
@@ -199,7 +270,7 @@ impl TableEntry<'_> {
             return Ok(None);
         }
 
-        let value = Expression::parse_until(tokens, vec![terminator, Token::Comma])?;
+        let value = Expression::parse_until_one_of(tokens, vec![terminator, Token::Comma])?;
 
         tokens.next_if_eq(&Ok(Token::Comma));
 

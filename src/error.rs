@@ -6,6 +6,7 @@ use non_zero::non_zero;
 use std::num::NonZeroUsize;
 use thiserror::Error;
 
+// TODO: Make this SyntaxErrorKind and add a struct with location information.
 #[derive(Clone, PartialEq, Debug, Default, Error)]
 pub enum SyntaxError<'source> {
     #[error("invalid token `{token}` at {line}:{column}")]
@@ -16,6 +17,7 @@ pub enum SyntaxError<'source> {
     },
     #[error("could not find a matching open bracket for the closing bracket")]
     UnmatchedClosingBracket,
+    // TODO: Remove.
     #[error("expected {}", one_of(expected_one_of))]
     UnexpectedEndOfFile { expected_one_of: TokenSet },
     #[error("expected an expression, found {found}")]
@@ -29,6 +31,11 @@ pub enum SyntaxError<'source> {
         expected_one_of: TokenSet,
         found: Option<Token<'source>>,
     },
+    #[error(
+        "expected an identifier for the iteration variable, found {}",
+        or_end_of_file(found)
+    )]
+    ExpectedIterationVariable { found: Option<Token<'source>> },
     #[default]
     #[error("unknown syntax error")]
     Unknown,
@@ -44,6 +51,16 @@ impl SyntaxError<'_> {
             line,
             column,
             token: lexer.slice().to_owned(),
+        }
+    }
+
+    pub(crate) fn expected_found<'source>(
+        expected: Token<'static>,
+        found: Option<Token<'source>>,
+    ) -> SyntaxError<'source> {
+        SyntaxError::Expected {
+            expected_one_of: vec![expected],
+            found,
         }
     }
 }
