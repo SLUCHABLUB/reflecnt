@@ -35,6 +35,13 @@ pub enum Token<'source> {
     #[display("`)`")]
     #[token(")")]
     ClosingParenthesis,
+
+    #[display("`{{`")]
+    #[token("{")]
+    OpeningBrace,
+    #[display("`}}`")]
+    #[token("}")]
+    ClosingBrace,
 }
 
 impl<'source> Token<'source> {
@@ -51,6 +58,8 @@ impl<'source> Token<'source> {
             Token::Comma => NonWhitespaceToken::Comma,
             Token::OpeningParenthesis => NonWhitespaceToken::OpeningParenthesis,
             Token::ClosingParenthesis => NonWhitespaceToken::ClosingParenthesis,
+            Token::OpeningBrace => NonWhitespaceToken::OpeningBrace,
+            Token::ClosingBrace => NonWhitespaceToken::ClosingBrace,
         })
     }
 }
@@ -67,6 +76,8 @@ pub(crate) enum NonWhitespaceToken<'source> {
 
     OpeningParenthesis,
     ClosingParenthesis,
+    OpeningBrace,
+    ClosingBrace,
 }
 
 pub(crate) type Tokens<'source> = Peekable<Lexer<'source, Token<'source>>>;

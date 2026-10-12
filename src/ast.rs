@@ -128,8 +128,13 @@ impl Expression<'_> {
             NonWhitespaceToken::OpeningParenthesis => {
                 Expression::parse_terminated(tokens, Token::ClosingParenthesis)?
             }
-            NonWhitespaceToken::ClosingParenthesis => {
+            NonWhitespaceToken::ClosingParenthesis | NonWhitespaceToken::ClosingBrace => {
                 return Err(SyntaxError::UnmatchedClosingBracket);
+            }
+            NonWhitespaceToken::OpeningBrace => {
+                return Err(SyntaxError::ExpectedExpression {
+                    found: Token::OpeningBrace,
+                });
             }
         };
 
