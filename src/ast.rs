@@ -120,8 +120,10 @@ impl Expression<'_> {
             NonWhitespaceToken::Identifier(identifier) => Expression::Identifier(identifier),
             NonWhitespaceToken::TextLiteral(escaped) => Expression::Text { escaped },
             NonWhitespaceToken::NumberLiteral(string) => Expression::Number { string },
-            NonWhitespaceToken::Comma
-            | NonWhitespaceToken::Assignment
+            NonWhitespaceToken::Assignment
+            | NonWhitespaceToken::Comma
+            | NonWhitespaceToken::Conjunction
+            | NonWhitespaceToken::Modulo
             | NonWhitespaceToken::OpeningBrace => {
                 return Err(SyntaxError::ExpectedExpression {
                     found: Token::from(token),

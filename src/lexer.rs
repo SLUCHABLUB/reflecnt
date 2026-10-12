@@ -30,14 +30,22 @@ pub enum Token<'source> {
     #[regex(r"\n", priority = 42)]
     LineBreak,
 
-    #[display("`,`")]
-    #[token(",")]
-    #[subenum(NonWhitespaceToken)]
-    Comma,
     #[display("`=`")]
     #[token("=")]
     #[subenum(NonWhitespaceToken)]
     Assignment,
+    #[display("`,`")]
+    #[token(",")]
+    #[subenum(NonWhitespaceToken)]
+    Comma,
+    #[display("`&`")]
+    #[token("&")]
+    #[subenum(NonWhitespaceToken)]
+    Conjunction,
+    #[display("`%`")]
+    #[token("%")]
+    #[subenum(NonWhitespaceToken)]
+    Modulo,
 
     #[display("`(`")]
     #[token("(")]
