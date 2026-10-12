@@ -3,21 +3,26 @@ use derive_more::Display;
 use logos::Lexer;
 use logos::Logos;
 use std::iter::Peekable;
+use subenum::subenum;
 
 #[derive(Copy, Clone, PartialEq, Debug, Display, Logos)]
 #[logos(skip r"\s+")]
 #[logos(error(SyntaxError<'static>, callback = SyntaxError::invalid_token))]
+#[subenum(NonWhitespaceToken)]
 pub enum Token<'source> {
     #[display("`{_0}`")]
     #[regex(r"[\p{XID_Start}_]\p{XID_Continue}*")]
+    #[subenum(NonWhitespaceToken)]
     Identifier(&'source str),
 
     #[display("`{_0}`")]
     #[regex(r#"("(.|\")+")"#)]
+    #[subenum(NonWhitespaceToken)]
     // TODO: Name the field.
     TextLiteral(&'source str),
     #[display("`{_0}`")]
     #[regex(r"[0-9]([0-9_]*[0-9])?i?")]
+    #[subenum(NonWhitespaceToken)]
     // TODO: Name the field.
     NumberLiteral(&'source str),
 
@@ -27,20 +32,29 @@ pub enum Token<'source> {
 
     #[display("`,`")]
     #[token(",")]
+    #[subenum(NonWhitespaceToken)]
     Comma,
+    #[display("`=`")]
+    #[token("=")]
+    #[subenum(NonWhitespaceToken)]
+    Assignment,
 
     #[display("`(`")]
     #[token("(")]
+    #[subenum(NonWhitespaceToken)]
     OpeningParenthesis,
     #[display("`)`")]
     #[token(")")]
+    #[subenum(NonWhitespaceToken)]
     ClosingParenthesis,
 
     #[display("`{{`")]
     #[token("{")]
+    #[subenum(NonWhitespaceToken)]
     OpeningBrace,
     #[display("`}}`")]
     #[token("}")]
+    #[subenum(NonWhitespaceToken)]
     ClosingBrace,
 }
 
@@ -50,35 +64,12 @@ impl<'source> Token<'source> {
     }
 
     pub(crate) fn as_non_whitespace(&self) -> Option<NonWhitespaceToken<'source>> {
-        Some(match self {
-            Token::Identifier(identifier) => NonWhitespaceToken::Identifier(identifier),
-            Token::TextLiteral(escaped) => NonWhitespaceToken::TextLiteral(escaped),
-            Token::NumberLiteral(string) => NonWhitespaceToken::NumberLiteral(string),
-            Token::LineBreak => return None,
-            Token::Comma => NonWhitespaceToken::Comma,
-            Token::OpeningParenthesis => NonWhitespaceToken::OpeningParenthesis,
-            Token::ClosingParenthesis => NonWhitespaceToken::ClosingParenthesis,
-            Token::OpeningBrace => NonWhitespaceToken::OpeningBrace,
-            Token::ClosingBrace => NonWhitespaceToken::ClosingBrace,
-        })
+        NonWhitespaceToken::try_from(*self).ok()
     }
 }
 
 // TODO: Remove this type and make the parser function generic over any iterable.
 pub type TokenSet = Vec<Token<'static>>;
-
-pub(crate) enum NonWhitespaceToken<'source> {
-    Identifier(&'source str),
-    TextLiteral(&'source str),
-    NumberLiteral(&'source str),
-
-    Comma,
-
-    OpeningParenthesis,
-    ClosingParenthesis,
-    OpeningBrace,
-    ClosingBrace,
-}
 
 pub(crate) type Tokens<'source> = Peekable<Lexer<'source, Token<'source>>>;
 

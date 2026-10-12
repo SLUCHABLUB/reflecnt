@@ -280,6 +280,7 @@ dependencies = [
  "logos",
  "non-zero",
  "pretty_assertions",
+ "subenum",
  "thiserror",
 ]
 
@@ -320,6 +321,18 @@ name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
+
+[[package]]
+name = "subenum"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5eee3fb942ed39f3971438fcc7e05e20717e599e14c5c7cb50edd0df2a44b274"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
 
 [[package]]
 name = "syn"

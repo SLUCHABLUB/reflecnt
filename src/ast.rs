@@ -120,9 +120,11 @@ impl Expression<'_> {
             NonWhitespaceToken::Identifier(identifier) => Expression::Identifier(identifier),
             NonWhitespaceToken::TextLiteral(escaped) => Expression::Text { escaped },
             NonWhitespaceToken::NumberLiteral(string) => Expression::Number { string },
-            NonWhitespaceToken::Comma => {
+            NonWhitespaceToken::Comma
+            | NonWhitespaceToken::Assignment
+            | NonWhitespaceToken::OpeningBrace => {
                 return Err(SyntaxError::ExpectedExpression {
-                    found: Token::Comma,
+                    found: Token::from(token),
                 });
             }
             NonWhitespaceToken::OpeningParenthesis => {
@@ -130,11 +132,6 @@ impl Expression<'_> {
             }
             NonWhitespaceToken::ClosingParenthesis | NonWhitespaceToken::ClosingBrace => {
                 return Err(SyntaxError::UnmatchedClosingBracket);
-            }
-            NonWhitespaceToken::OpeningBrace => {
-                return Err(SyntaxError::ExpectedExpression {
-                    found: Token::OpeningBrace,
-                });
             }
         };
 
